@@ -1,0 +1,27 @@
+ 1 AtomicIntegerArray ticket = new AtomicIntegerArray(threads); //ticket for threads in line, n - number of threads
+  2 AtomicIntegerArray choosing = new AtomicIntegerArray(threads); //need this for non-atomic max selection
+  3 //initialize both arrays
+  4 for(int i = 0; i < threads; ++i)
+  5 {
+  6     ticket.set(i, 0);
+  7     choosing.set(i, 0);
+  8 }
+  9 public void lock(int tid) //thread ID
+ 10 {
+ 11     choosing.set(tid, 1);
+ 12     ticket.set(tid, max(ticket) + 1); //find max in the array and return it
+ 13     choosing.set(tid, 0);
+ 14     for(int i = 0; i < ticket.length; ++i)
+ 15     {
+ 16         if(i != tid)
+ 17         {
+ 18             while(choosing.get(i) == 1){} //wait while other thread picks a ticket
+ 19             while(ticket.get(i) != 0 &&( ticket.get(tid) > ticket.get(i) || (ticket.get(tid) == ticket.get(i) && tid > i)))
+ 20             {}
+ 21         }
+ 22     }
+ 23 }
+ 24 public void unlock(int tid)
+ 25 {
+ 26     ticket.set(tid, 0);
+ 27 }
